@@ -1,7 +1,6 @@
 package ru.hogwarts.school.service.interfaces;
 
 import ru.hogwarts.school.model.Faculty;
-import ru.hogwarts.school.model.Student;
 
 import java.util.List;
 
@@ -13,9 +12,9 @@ public interface FacultyService {
 
     Faculty update(Faculty faculty);
 
-    Faculty delete(long id);
+    void delete(long id);
 
-    List<Faculty> findColor(String color);
+    List<Faculty> findByColor(String color);
 }
 
 

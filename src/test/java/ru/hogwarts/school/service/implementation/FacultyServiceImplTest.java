@@ -1,133 +1,66 @@
 package ru.hogwarts.school.service.implementation;
 
 import org.junit.jupiter.api.Test;
-import ru.hogwarts.school.exception.FacultyCRUDException;
-import ru.hogwarts.school.exception.StudentCRUDException;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import ru.hogwarts.school.model.Faculty;
-import ru.hogwarts.school.model.Student;
-import ru.hogwarts.school.service.interfaces.FacultyService;
+import ru.hogwarts.school.repository.FacultyRepository;
 
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class FacultyServiceImplTest {
 
-    FacultyService underTest = new FacultyServiceImpl();
+    @Mock
+    FacultyRepository facultyRepository;
 
-    Faculty faculty1 = new Faculty(1L, "Юрфак", "красный");
-    Faculty faculty2 = new Faculty(1L, "Журфак", "красный");
-    Faculty faculty3 = new Faculty(1L, "Педфак", "синий");
+    @InjectMocks
+    FacultyServiceImpl underTest;
+
+    Faculty faculty = new Faculty(1L, "Юрфак", "синий");
 
     @Test
-    void create_facultyNotMap_facultyAdded() {
-
-        Faculty result = underTest.create(faculty1);
-        assertEquals(faculty1, result);
-        assertEquals(1, faculty1.getId());
-
+    void create_newFaculty_addAndReturn() {
+        when(facultyRepository.save(faculty)).thenReturn(faculty);
+        Faculty res = underTest.create(faculty);
+        assertEquals(faculty, res);
 
     }
 
     @Test
-    void create_facultyInMap_throwException() {
-
-        underTest.create(faculty1);
-        assertThrows(FacultyCRUDException.class, () -> underTest.create(faculty1));
-
-
+    void read_FacultyInDatabase_addAndReturn() {
+        when(facultyRepository.findById(faculty.getId())).thenReturn(Optional.ofNullable(faculty));
+        Faculty res = underTest.reade(faculty.getId());
+        assertEquals(faculty, res);
     }
 
     @Test
-    void read_facultyInMap_facultyAdded() {
-
-        underTest.create(faculty1);
-        Faculty faculty = underTest.reade(1L);
-
-        assertNotNull(faculty);
-        assertEquals(1L, faculty.getId());
-        assertEquals("Юрфак", faculty.getName());
-
+    void update_FacultyInDatabase_addAndReturn(){
+        when(facultyRepository.save(faculty)).thenReturn(faculty);
+        Faculty res = underTest.update(faculty);
+        assertEquals(faculty,res);
     }
 
     @Test
-    void read_facultyNotMap_throwException() {
-
-        underTest.create(faculty1);
-        Faculty faculty = underTest.reade(1L);
-
-        assertThrows(FacultyCRUDException.class, () -> underTest.reade(2L));
-
-
+    void delete__FacultyInDatabase_delete(){
+        doNothing().when(facultyRepository).deleteById(faculty.getId());
+        underTest.delete(faculty.getId());
+        verify(facultyRepository,times(1)).deleteById(faculty.getId());
     }
 
     @Test
-    void update_facultyInMap_facultyAdded() {
+    void findByColor_areFacultyWithColorInDatabase_returnListWithFacultyByColor(){
 
-        underTest.create(faculty1);
-        Faculty updatedFaculty = new Faculty(1L, "Иняз", "жёлтый");
-        Faculty result = underTest.update(updatedFaculty);
-
-        assertEquals(updatedFaculty.getId(), result.getId());
-        assertEquals(updatedFaculty.getName(), result.getName());
-        assertEquals(updatedFaculty, underTest.reade(updatedFaculty.getId()));
-
+        when(facultyRepository.findByColor(faculty.getColor())).thenReturn(List.of(faculty));
+        List<Faculty> res = underTest.findByColor(faculty.getColor());
+        assertEquals(List.of(faculty),res);
 
     }
 
-    @Test
-    void update_facultyNotMap_throwException() {
-
-        underTest.create(faculty1);
-        Faculty updatedFaculty = new Faculty(3L, "Иняз", "жёлтый");
-
-        assertThrows(FacultyCRUDException.class, () -> underTest.update(updatedFaculty));
-
-
-    }
-
-    @Test
-    void delete_facultyInMap_facultyAdded(){
-        underTest.create(faculty1);
-
-        Faculty result = underTest.delete(1L);
-        assertEquals(faculty1, result);
-    }
-
-    @Test
-    void delete_facultyNotMap_throwException(){
-
-        underTest.create(faculty1);
-        Faculty result = underTest.delete(1L);
-        assertThrows(FacultyCRUDException.class, () -> underTest.reade(2L));
-
-    }
-
-    @Test
-    void findColor_facultyInMap_facultyAdded(){
-
-        underTest.create(faculty1);
-        underTest.create(faculty2);
-        underTest.create(faculty3);
-
-        String targetColor = "красный";
-        List<Faculty> result = underTest.findColor(targetColor);
-        assertFalse(result.isEmpty());
-        assertEquals(2, result.size());
-
-    }
-
-    @Test
-    void findColor_facultyNotMap_facultyEmptyList(){
-
-        underTest.create(faculty1);
-        underTest.create(faculty2);
-        underTest.create(faculty3);
-
-        String targetColor = "чёрный";
-        List<Faculty> result = underTest.findColor(targetColor);
-        assertTrue(result.isEmpty());
-        assertEquals(0, result.size());
-
-    }
 }
