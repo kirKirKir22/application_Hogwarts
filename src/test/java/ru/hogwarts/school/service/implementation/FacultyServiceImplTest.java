@@ -5,13 +5,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.hogwarts.school.exception.FacultyCRUDException;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.repository.FacultyRepository;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -27,39 +31,91 @@ class FacultyServiceImplTest {
 
     @Test
     void create_newFaculty_addAndReturn() {
+
         when(facultyRepository.save(faculty)).thenReturn(faculty);
         Faculty res = underTest.create(faculty);
         assertEquals(faculty, res);
+    }
+
+    @Test
+    void create_FacultyInDatabase_throwFacultyCRUDException() {
+
+        when(facultyRepository.findByNameAndColor(faculty.getName(), faculty.getColor()))
+                .thenReturn(Optional.of(faculty));
+        FacultyCRUDException result = assertThrows(FacultyCRUDException.class, () -> underTest.create(faculty));
+        assertEquals("такой факультет уже есть в базе", result.getMessage());
 
     }
 
     @Test
     void read_FacultyInDatabase_addAndReturn() {
+
         when(facultyRepository.findById(faculty.getId())).thenReturn(Optional.ofNullable(faculty));
-        Faculty res = underTest.reade(faculty.getId());
+        Faculty res = underTest.read(faculty.getId());
         assertEquals(faculty, res);
     }
 
     @Test
-    void update_FacultyInDatabase_addAndReturn(){
+    void read_FacultyNotInDatabase_throwFacultyCRUDException() {
+
+        when(facultyRepository.findById(1L)).thenReturn(Optional.empty());
+        FacultyCRUDException result = assertThrows(FacultyCRUDException.class, () -> underTest.read(1L));
+        assertEquals("факультет в базе не найден", result.getMessage());
+    }
+
+    @Test
+    void update_FacultyInDatabase_addAndReturn() {
+
+        when(facultyRepository.findById(faculty.getId())).thenReturn(Optional.of(faculty));
         when(facultyRepository.save(faculty)).thenReturn(faculty);
-        Faculty res = underTest.update(faculty);
-        assertEquals(faculty,res);
+        Faculty result = underTest.update(faculty);
+        assertEquals(faculty, result);
     }
 
     @Test
-    void delete__FacultyInDatabase_delete(){
-        doNothing().when(facultyRepository).deleteById(faculty.getId());
-        underTest.delete(faculty.getId());
-        verify(facultyRepository,times(1)).deleteById(faculty.getId());
+    void update_FacultyNotInDatabase_throwFacultyCRUDException() {
+
+        when(facultyRepository.findById(faculty.getId())).thenReturn(Optional.empty());
+        FacultyCRUDException result = assertThrows(FacultyCRUDException.class, () -> underTest.update(faculty));
+        assertEquals("факультет в базе не найден", result.getMessage());
+    }
+
+
+    @Test
+    void delete_FacultyInDatabase_deleteAndReturn() {
+
+        when(facultyRepository.findById(1L)).thenReturn(Optional.of(faculty));
+        doNothing().when(facultyRepository).deleteById(1L);
+        Faculty result = underTest.delete(1L);
+        assertEquals(faculty, result);
     }
 
     @Test
-    void findByColor_areFacultyWithColorInDatabase_returnListWithFacultyByColor(){
+    void delete_FacultyNotInDatabase_throwFacultyCRUDException() {
+
+        when(facultyRepository.findById(1L)).thenReturn(Optional.empty());
+        FacultyCRUDException result = assertThrows(FacultyCRUDException.class, () -> underTest.read(1L));
+        assertThrows(FacultyCRUDException.class, () -> underTest.read(1L));
+        assertEquals("факультет в базе не найден", result.getMessage());
+
+    }
+
+    @Test
+    void findByColor_areFacultyWithColorInDatabase_returnListWithFacultyByColor() {
 
         when(facultyRepository.findByColor(faculty.getColor())).thenReturn(List.of(faculty));
         List<Faculty> res = underTest.findByColor(faculty.getColor());
-        assertEquals(List.of(faculty),res);
+        assertEquals(List.of(faculty), res);
+
+    }
+
+    @Test
+    void findByColor_areNotFacultyWithColorInDatabase_returnListEmptyList() {
+
+        when(facultyRepository.findByColor("синий")).thenReturn(new ArrayList<Faculty>());
+        List<Faculty> result = underTest.findByColor("синий");
+        List<Faculty> expected = Collections.<Faculty>emptyList();
+        assertEquals(expected, result);
 
     }
 
