@@ -3,63 +3,70 @@ package ru.hogwarts.school.service.implementation;
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.exception.StudentCRUDException;
 import ru.hogwarts.school.model.Student;
+import ru.hogwarts.school.repository.StudentRepository;
 import ru.hogwarts.school.service.interfaces.StudentService;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Optional;
+
 
 @Service
 public class StudentServiceImpl implements StudentService {
 
-    private final Map<Long, Student> studentMap = new HashMap<>();
+    private final StudentRepository studentRepository;
 
-    private long counterId = 1L;
+    public StudentServiceImpl(StudentRepository studentRepository) {
+        this.studentRepository = studentRepository;
+    }
+
 
     @Override
     public Student create(Student student) {
-        if (studentMap.containsValue(student)) {
-            throw new StudentCRUDException("такой студент уже существует");
+
+        if (studentRepository.findByNameAndAge(student.getName(), student.getAge()).isPresent()) {
+            throw new StudentCRUDException("такой студент уже есть в базе данных");
         }
-        student.setId(counterId++);
-        studentMap.put(student.getId(), student);
-        return student;
+        return studentRepository.save(student);
+
     }
 
+
     @Override
-    public Student reade(long id) {
-        if (!studentMap.containsKey(id)) {
-            throw new StudentCRUDException("студент не найден");
+    public Student read(long id) {
+        Optional<Student> student = studentRepository.findById(id);
+        if (student.isEmpty()) {
+            throw new StudentCRUDException("студент в базе не найден");
         }
-        return studentMap.get(id);
+        return student.get();
     }
 
 
     @Override
     public Student update(Student student) {
-        if (!studentMap.containsKey(student.getId())) {
-            throw new StudentCRUDException("студент не найден");
+        if (studentRepository.findById(student.getId()).isEmpty()) {
+            throw new StudentCRUDException("студент в базе не найден");
+
         }
-        studentMap.put(student.getId(), student);
-        return student;
+        return studentRepository.save(student);
+
     }
 
     @Override
     public Student delete(long id) {
-        Student student = studentMap.remove(id);
-        if (student == null) {
-            throw new StudentCRUDException("студент не найден");
+        Optional<Student> student = studentRepository.findById(id);
+        if (student.isEmpty()) {
+            throw new StudentCRUDException("студент в базе не найден");
         }
+        studentRepository.deleteById(id);
+        return student.get();
 
-        return student;
+
     }
 
+
     @Override
-    public List<Student> findAge(int age) {
-        return studentMap.values().stream()
-                .filter(st -> st.getAge() == age)
-                .collect(Collectors.toUnmodifiableList());
+    public List<Student> findByAge(int age) {
+        return studentRepository.findByAge(age);
 
     }
 }
