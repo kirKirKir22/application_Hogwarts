@@ -3,7 +3,9 @@ package ru.hogwarts.school.service.implementation;
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.exception.FacultyCRUDException;
 import ru.hogwarts.school.model.Faculty;
+import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
+import ru.hogwarts.school.repository.StudentRepository;
 import ru.hogwarts.school.service.interfaces.FacultyService;
 
 
@@ -15,8 +17,11 @@ public class FacultyServiceImpl implements FacultyService {
 
     private final FacultyRepository facultyRepository;
 
-    public FacultyServiceImpl(FacultyRepository facultyRepository) {
+    private final StudentRepository studentRepository;
+
+    public FacultyServiceImpl(FacultyRepository facultyRepository, StudentRepository studentRepository) {
         this.facultyRepository = facultyRepository;
+        this.studentRepository = studentRepository;
     }
 
 
@@ -60,5 +65,24 @@ public class FacultyServiceImpl implements FacultyService {
     public List<Faculty> findByColor(String color) {
         return facultyRepository.findByColor(color);
 
+    }
+
+    @Override
+    public Faculty findByNameOrColor(String name, String color) {
+        Optional<Faculty> faculty = Optional.ofNullable(facultyRepository.findByNameIgnoreCaseOrColorIgnoreCase(name, color));
+        if (faculty.isEmpty()) {
+            throw new FacultyCRUDException("факультет в базе не найден");
+        }
+        return faculty.get();
+    }
+
+    @Override
+    public List<Student> findById(long id) {
+        return studentRepository.findByFaculty_id(id);
+    }
+
+    @Override
+    public List<Faculty> findAllFaculties() {
+        return facultyRepository.findAll();
     }
 }

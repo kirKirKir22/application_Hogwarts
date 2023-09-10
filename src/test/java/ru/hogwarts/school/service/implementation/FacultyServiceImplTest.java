@@ -7,7 +7,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.hogwarts.school.exception.FacultyCRUDException;
 import ru.hogwarts.school.model.Faculty;
+import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
+import ru.hogwarts.school.repository.StudentRepository;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,6 +25,9 @@ class FacultyServiceImplTest {
 
     @Mock
     FacultyRepository facultyRepository;
+
+    @Mock
+    private StudentRepository studentRepository;
 
     @InjectMocks
     FacultyServiceImpl underTest;
@@ -118,5 +123,33 @@ class FacultyServiceImplTest {
         assertEquals(expected, result);
 
     }
+
+    @Test
+    void findByNameOrColor_areFacultyWithColorOrNameInDatabase_returnListWithFacultyByColorOrName() {
+
+        when(facultyRepository.findByNameIgnoreCaseOrColorIgnoreCase(faculty.getName(), faculty.getColor())).thenReturn(faculty);
+        Faculty result = underTest.findByNameOrColor(faculty.getName(), faculty.getColor());
+        assertEquals(faculty, result);
+
+    }
+
+    @Test
+    void findByNameOrColor_areNotFacultyWithColorOrNameInDatabase_throwFacultyCRUDException() {
+
+        when(facultyRepository.findByNameIgnoreCaseOrColorIgnoreCase(faculty.getName(),faculty.getColor())).thenReturn(null );
+        assertThrows(FacultyCRUDException.class, () -> underTest.findByNameOrColor(faculty.getName(),faculty.getColor()));
+    }
+    @Test
+    void  findStudentByFaculty_studentsInFaculty_returnFaculty(){
+
+        Faculty faculty = new Faculty(1L, "Юрфак", "синий");
+        Student student = new Student(1L, "Igor", 10, faculty);
+
+        when(studentRepository.findById(1L)).thenReturn(Optional.of(student));
+        List<Student> result = studentRepository.findByFaculty_id(1L);
+        assertEquals(faculty, result);
+
+    }
+
 
 }
