@@ -48,13 +48,13 @@ public class FacultyController {
     }
 
     @GetMapping("/color/{color}/{name}")
-    public Faculty findByNameIgnoreCaseOrColorIgnoreCase
-            (@PathVariable(required = false) String color,
-             @PathVariable(required = false) String name) {
+    public List<Faculty> findByNameIgnoreCaseOrColorIgnoreCase
+            (@RequestParam(required = false) String color,
+             @RequestParam(required = false) String name) {
         return facultyService.findByNameOrColor(name, color);
     }
 
-    @GetMapping("/student/{id}")
+    @GetMapping("/{id}/student")
     public List<Student> findByFaculty_id(@PathVariable long id) {
         return findByFaculty_id(id);
     }

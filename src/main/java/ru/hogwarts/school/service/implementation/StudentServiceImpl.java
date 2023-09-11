@@ -71,25 +71,18 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public List<Student> findByAgeBetween(Integer min, Integer max) {
-
-        if (studentRepository.findByAgeBetween(min, max).isEmpty()) {
-            throw new StudentException("студенты в базе не найдены");
-        }
-
         return studentRepository.findByAgeBetween(min, max);
+
     }
+
     @Override
     public Faculty findStudentByFaculty(Long studentId) {
-        Optional<Student> student = studentRepository.findById(studentId);
-        if (student.isPresent()) {
-            return student.get().getFaculty();
-        } else {
-            throw new StudentException("факультет студента не найден");
+        return read(studentId).getFaculty();
 
-        }
     }
+
     @Override
     public List<Student> findAllStudents() {
-        return studentRepository.findAll(); // Это я для себя служебный метод создал. Можно на него тесты потом напишу такой же и на факультетах?
+        return studentRepository.findAll();
     }
 }
