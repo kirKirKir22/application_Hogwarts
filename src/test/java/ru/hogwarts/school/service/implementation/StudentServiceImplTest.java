@@ -10,14 +10,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-import ru.hogwarts.school.exception.StudentCRUDException;
+import ru.hogwarts.school.exception.StudentException;
+import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.StudentRepository;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @ExtendWith(MockitoExtension.class)
 class StudentServiceImplTest {
@@ -27,8 +25,17 @@ class StudentServiceImplTest {
 
     @InjectMocks
     StudentServiceImpl underTest;
+    Faculty faculty = new Faculty(1L, "физкультурный", "малиновый");
 
-    Student student = new Student(1L, "Igor", 10);
+    Student student = new Student(1L, "Igor", 10, faculty);
+
+    Student student1 = new Student(2L, "Misha", 10, faculty);
+    Student student2 = new Student(3L, "Petr", 15, faculty);
+    Student student3 = new Student(4L, "Oleg", 20, faculty);
+
+
+    List<Student> students = Arrays.asList(student1, student2, student3);
+
 
     @Test
     void create_newStudent_addAndReturn() {
@@ -44,7 +51,7 @@ class StudentServiceImplTest {
 
         when(studentRepository.findByNameAndAge(student.getName(), student.getAge()))
                 .thenReturn(Optional.of(student));
-        StudentCRUDException result = assertThrows(StudentCRUDException.class, () -> underTest.create(student));
+        StudentException result = assertThrows(StudentException.class, () -> underTest.create(student));
         assertEquals("такой студент уже есть в базе данных", result.getMessage());
 
     }
@@ -62,7 +69,7 @@ class StudentServiceImplTest {
     void read_StudentNotInDatabase_throwStudentCRUDException() {
 
         when(studentRepository.findById(1L)).thenReturn(Optional.empty());
-        StudentCRUDException result = assertThrows(StudentCRUDException.class, () -> underTest.read(1L));
+        StudentException result = assertThrows(StudentException.class, () -> underTest.read(1L));
         assertEquals("студент в базе не найден", result.getMessage());
 
     }
@@ -81,7 +88,7 @@ class StudentServiceImplTest {
     void update_StudentNotInDatabase_throwStudentCRUDException() {
 
         when(studentRepository.findById(student.getId())).thenReturn(Optional.empty());
-        StudentCRUDException result = assertThrows(StudentCRUDException.class, () -> underTest.update(student));
+        StudentException result = assertThrows(StudentException.class, () -> underTest.update(student));
         assertEquals("студент в базе не найден", result.getMessage());
     }
 
@@ -98,8 +105,8 @@ class StudentServiceImplTest {
     void delete_StudentNotInDatabase_throwStudentCRUDException() {
 
         when(studentRepository.findById(1L)).thenReturn(Optional.empty());
-        StudentCRUDException result = assertThrows(StudentCRUDException.class, () -> underTest.read(1L));
-        assertThrows(StudentCRUDException.class, () -> underTest.read(1L));
+        StudentException result = assertThrows(StudentException.class, () -> underTest.read(1L));
+        assertThrows(StudentException.class, () -> underTest.read(1L));
         assertEquals("студент в базе не найден", result.getMessage());
 
     }
@@ -113,7 +120,6 @@ class StudentServiceImplTest {
 
     }
 
-
     @Test
     void findByAge_areNotStudentWithAgeInDatabase_returnEmptyList() {
 
@@ -121,6 +127,32 @@ class StudentServiceImplTest {
         List<Student> result = underTest.findByAge(10);
         List<Student> expected = Collections.<Student>emptyList();
         assertEquals(expected, result);
+
+    }
+
+    @Test
+    void findByAgeBetween_areStudentWithAgeInDatabase_returnListWithStudentByAge() {
+
+        when(studentRepository.findByAgeBetween(10, 20)).thenReturn(students);
+
+        List<Student> result = underTest.findByAgeBetween(10, 20);
+
+        assertEquals(3, result.size());
+        assertEquals(student1, result.get(0));
+        assertEquals(student2, result.get(1));
+        assertEquals(student3, result.get(2));
+
+        verify(studentRepository, times(1)).findByAgeBetween(10, 20);
+
+    }
+
+    @Test
+    void findByAgeBetween_areNotStudentWithAgeInDatabase_throwStudentCRUDException() {
+
+        when(studentRepository.findByAgeBetween(50, 60)).thenReturn(Arrays.asList());
+
+        assertThrows(StudentException.class, () -> underTest.findByAgeBetween(50, 60));
+        verify(studentRepository, times(1)).findByAgeBetween(50, 60);
 
     }
 
