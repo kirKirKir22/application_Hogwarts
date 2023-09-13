@@ -5,8 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.stubbing.OngoingStubbing;
-import ru.hogwarts.school.exception.FacultyCRUDException;
+import ru.hogwarts.school.exception.FacultyException;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
@@ -50,7 +49,7 @@ class FacultyServiceImplTest {
 
         when(facultyRepository.findByNameAndColor(faculty.getName(), faculty.getColor()))
                 .thenReturn(Optional.of(faculty));
-        FacultyCRUDException result = assertThrows(FacultyCRUDException.class, () -> underTest.create(faculty));
+        FacultyException result = assertThrows(FacultyException.class, () -> underTest.create(faculty));
         assertEquals("такой факультет уже есть в базе", result.getMessage());
 
     }
@@ -67,7 +66,7 @@ class FacultyServiceImplTest {
     void read_FacultyNotInDatabase_throwFacultyCRUDException() {
 
         when(facultyRepository.findById(1L)).thenReturn(Optional.empty());
-        FacultyCRUDException result = assertThrows(FacultyCRUDException.class, () -> underTest.read(1L));
+        FacultyException result = assertThrows(FacultyException.class, () -> underTest.read(1L));
         assertEquals("факультет в базе не найден", result.getMessage());
     }
 
@@ -84,7 +83,7 @@ class FacultyServiceImplTest {
     void update_FacultyNotInDatabase_throwFacultyCRUDException() {
 
         when(facultyRepository.findById(faculty.getId())).thenReturn(Optional.empty());
-        FacultyCRUDException result = assertThrows(FacultyCRUDException.class, () -> underTest.update(faculty));
+        FacultyException result = assertThrows(FacultyException.class, () -> underTest.update(faculty));
         assertEquals("факультет в базе не найден", result.getMessage());
     }
 
@@ -102,8 +101,8 @@ class FacultyServiceImplTest {
     void delete_FacultyNotInDatabase_throwFacultyCRUDException() {
 
         when(facultyRepository.findById(1L)).thenReturn(Optional.empty());
-        FacultyCRUDException result = assertThrows(FacultyCRUDException.class, () -> underTest.read(1L));
-        assertThrows(FacultyCRUDException.class, () -> underTest.read(1L));
+        FacultyException result = assertThrows(FacultyException.class, () -> underTest.read(1L));
+        assertThrows(FacultyException.class, () -> underTest.read(1L));
         assertEquals("факультет в базе не найден", result.getMessage());
 
     }
@@ -141,7 +140,7 @@ class FacultyServiceImplTest {
     void findByNameOrColor_areNotFacultyWithColorOrNameInDatabase_throwFacultyCRUDException() {
 
         when(facultyRepository.findByNameIgnoreCaseOrColorIgnoreCase(faculty.getName(), faculty.getColor())).thenReturn(null);
-        assertThrows(FacultyCRUDException.class, () -> underTest.findByNameOrColor(faculty.getName(), faculty.getColor()));
+        assertThrows(FacultyException.class, () -> underTest.findByNameOrColor(faculty.getName(), faculty.getColor()));
     }
 
     @Test
