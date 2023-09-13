@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import ru.hogwarts.school.exception.FacultyCRUDException;
+import ru.hogwarts.school.exception.FacultyException;
 import ru.hogwarts.school.exception.StudentException;
 
 
@@ -17,8 +17,8 @@ public class ControllerExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
-    @ExceptionHandler(FacultyCRUDException.class)
-    public ResponseEntity<String> handleStudentException(FacultyCRUDException ex) {
+    @ExceptionHandler(FacultyException.class)
+    public ResponseEntity<String> handleStudentException(FacultyException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 

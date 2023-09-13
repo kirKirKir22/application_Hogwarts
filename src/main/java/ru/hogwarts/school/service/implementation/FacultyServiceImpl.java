@@ -1,7 +1,7 @@
 package ru.hogwarts.school.service.implementation;
 
 import org.springframework.stereotype.Service;
-import ru.hogwarts.school.exception.FacultyCRUDException;
+import ru.hogwarts.school.exception.FacultyException;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
@@ -28,7 +28,7 @@ public class FacultyServiceImpl implements FacultyService {
     @Override
     public Faculty create(Faculty faculty) {
         if (facultyRepository.findByNameAndColor(faculty.getName(), faculty.getColor()).isPresent()) {
-            throw new FacultyCRUDException("такой факультет уже есть в базе");
+            throw new FacultyException("такой факультет уже есть в базе");
         }
         return facultyRepository.save(faculty);
     }
@@ -37,7 +37,7 @@ public class FacultyServiceImpl implements FacultyService {
     public Faculty read(long id) {
         Optional<Faculty> faculty = facultyRepository.findById(id);
         if (faculty.isEmpty()) {
-            throw new FacultyCRUDException("факультет в базе не найден");
+            throw new FacultyException("факультет в базе не найден");
         }
         return faculty.get();
     }
@@ -45,7 +45,7 @@ public class FacultyServiceImpl implements FacultyService {
     @Override
     public Faculty update(Faculty faculty) {
         if (facultyRepository.findById(faculty.getId()).isEmpty()) {
-            throw new FacultyCRUDException("факультет в базе не найден");
+            throw new FacultyException("факультет в базе не найден");
         }
         return facultyRepository.save(faculty);
 
@@ -55,7 +55,7 @@ public class FacultyServiceImpl implements FacultyService {
     public Faculty delete(long id) {
         Optional<Faculty> faculty = facultyRepository.findById(id);
         if (faculty.isEmpty()) {
-            throw new FacultyCRUDException("факультет в базе не найден");
+            throw new FacultyException("факультет в базе не найден");
         }
         facultyRepository.deleteById(id);
         return faculty.get();
@@ -71,7 +71,7 @@ public class FacultyServiceImpl implements FacultyService {
     public List<Faculty> findByNameOrColor(String name, String color) {
         Optional<Faculty> faculty = Optional.ofNullable(facultyRepository.findByNameIgnoreCaseOrColorIgnoreCase(name, color));
         if (faculty.isEmpty()) {
-            throw new FacultyCRUDException("факультет в базе не найден");
+            throw new FacultyException("факультет в базе не найден");
         }
         return List.of(faculty.get());
     }
