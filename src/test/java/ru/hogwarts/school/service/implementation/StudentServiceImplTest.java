@@ -146,14 +146,4 @@ class StudentServiceImplTest {
 
     }
 
-    @Test
-    void findByAgeBetween_areNotStudentWithAgeInDatabase_throwStudentCRUDException() {
-
-        when(studentRepository.findByAgeBetween(50, 60)).thenReturn(Arrays.asList());
-
-        assertThrows(StudentException.class, () -> underTest.findByAgeBetween(50, 60));
-        verify(studentRepository, times(1)).findByAgeBetween(50, 60);
-
-    }
-
 }

@@ -13,6 +13,7 @@ public class Avatar {
     private long fileSize;
     private String mediaType;
 
+    @Lob
     private byte[] data;
 
 
