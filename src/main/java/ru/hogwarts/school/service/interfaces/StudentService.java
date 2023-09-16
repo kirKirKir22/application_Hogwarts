@@ -22,4 +22,12 @@ public interface StudentService {
     Faculty findStudentFaculty(Long studentId);
 
     List<Student> findAllStudents();
+
+    Integer findStudentCount();
+
+    Integer findAvgAge();
+
+    List<Student> findFiveLastStudent();
+
+
 }

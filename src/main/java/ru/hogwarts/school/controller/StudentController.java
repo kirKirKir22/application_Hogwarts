@@ -59,4 +59,18 @@ public class StudentController {
     public List<Student> findAllStudents() { // сделан 1 часть
         return studentService.findAllStudents();
     }
+
+    @GetMapping("/count")
+    public Integer findStudentCount() {
+        return studentService.findStudentCount();
+    }
+    @GetMapping("/age-avg")
+    public Integer findAvgAge() {
+        return studentService.findAvgAge();
+    }
+    @GetMapping("last-five-students")
+    public List<Student> findFiveLastStudent() {
+        return studentService.findFiveLastStudent();
+    }
+
 }
