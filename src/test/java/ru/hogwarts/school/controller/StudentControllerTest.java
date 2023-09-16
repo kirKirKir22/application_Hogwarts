@@ -13,8 +13,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import ru.hogwarts.school.controller.StudentController;
-import ru.hogwarts.school.exception.StudentException;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
@@ -41,12 +39,14 @@ public class StudentControllerTest {
     private FacultyRepository facultyRepository;
 
     String url = "http://localhost:" + port + "/student";
+
     Faculty faculty = new Faculty(1L, "физкультурный", "малиновый");
     Student student = new Student(1L, "Igor", 10, faculty);
 
     @AfterEach
     void afterEach() {
         studentRepository.deleteAll();
+        facultyRepository.deleteAll();
     }
 
 
@@ -55,7 +55,6 @@ public class StudentControllerTest {
 
         ResponseEntity<Faculty> facultyResponseEntity = restTemplate.
                 postForEntity("http://localhost:" + port + "/faculty", faculty, Faculty.class);
-
         ResponseEntity<Student> studentResponseEntity = restTemplate.
                 postForEntity("http://localhost:" + port + "/student", student, Student.class);
 
@@ -67,32 +66,52 @@ public class StudentControllerTest {
 
     @Test
     void read_studentNotInDb_returnStatus400AndStudent() {
-        ResponseEntity<String> stringResponseEntity = restTemplate.getForEntity("http://localhost:" + port + "/student" + student.getId(), String.class);
+        ResponseEntity<String> stringResponseEntity = restTemplate.getForEntity
+                ("http://localhost:" + port + "/student" + student.getId(), String.class);
 
         assertEquals(HttpStatus.NOT_FOUND, stringResponseEntity.getStatusCode());
 
     }
 
     @Test
-    void findAllStudents__returnStatus200AndStudentsList() {
+    void update__returnStatus200AndStudent() {
+        facultyRepository.save(faculty);
+        Student savedStudent = studentRepository.save(student);
 
-        String url = "http://localhost:" + port + "/student/all";
+        ResponseEntity<Student> response = restTemplate.exchange(
 
-        ResponseEntity<List<Student>> responseEntity = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<List<Student>>() {
-                });
+                "http://localhost:" + port + "/student",
+                HttpMethod.PUT,
+                new HttpEntity<>(savedStudent),
+                Student.class);
 
-        List<Student> students = responseEntity.getBody();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertEquals(student.getName(), response.getBody().getName());
+        assertEquals(student.getAge(), response.getBody().getAge());
 
-        assertEquals(200, responseEntity.getStatusCodeValue());
-        assertNotNull(students);
     }
 
     @Test
-    void readAgeTest() {
+    public void deleteStudent__returnStatus200() {
+        facultyRepository.save(faculty);
+        Student test = studentRepository.save(student);
+        student.setFaculty(faculty);
+
+        String url = "http://localhost:" + port + "/student/" + test.getId();
+
+        ResponseEntity<Student> responseEntity = restTemplate.exchange(
+                url,                // URL эндпоинта удаления
+                HttpMethod.DELETE,  // HTTP метод DELETE
+                null,               // Запрос-тело (в данном случае не используется)
+                Student.class          // Ожидаемый тип ответа (класс, так как мы ожидаем только статус 200)
+        );
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+
+    }
+
+    @Test
+    void readAge__returnStatus200AndStudentsList() {
 
         int ageToSearch = 25;
         ResponseEntity<List<Student>> response = restTemplate.exchange(
@@ -109,62 +128,53 @@ public class StudentControllerTest {
     }
 
     @Test
-    public void testUpdateStudent() {
-
-
-    }
-
-    @Test
-    public void testDeleteStudent() {
-
-       /* facultyRepository.save(faculty);
-        studentRepository.save(student);
-        ResponseEntity<Void> response = restTemplate.exchange
-        ( "http://localhost:" + port + "/student" + student.getId(), HttpMethod.DELETE, null, Void.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(studentRepository.findById(student.getId())).isEmpty();*/
-    }
-
-    /*@Test
     public void testFindByAgeBetween() {
-
         int minAge = 20;
         int maxAge = 30;
-
-
         ResponseEntity<List<Student>> response = restTemplate.exchange(
-                "http://localhost:" + port + "/student/age/{min}/{max}",
+                "http://localhost:" + port + "/student/age/",
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<List<Student>>() {},
+                new ParameterizedTypeReference<List<Student>>() {
+                },
                 minAge, maxAge
         );
-
-
-        assertThat(response.getStatusCodeValue()).isEqualTo(200);
-*/
-
+        assertThat(response.getStatusCodeValue()).isEqualTo(200); // не понял
+    }
 
     @Test
-    public void testFindStudentFaculty() {
+    public void findStudentFaculty__returnStatus200() {
 
-        Long studentId = 1L;
+        Faculty f = facultyRepository.save(faculty);
+        student.setFaculty(f);
+        Student s = studentRepository.save(student);
 
-        ResponseEntity<Faculty> response = restTemplate.getForEntity("http://localhost:" + port + "/student/{id}/faculty", Faculty.class, studentId);
-
-        assertThat(response.getStatusCodeValue()).isEqualTo(200);
-
-        Faculty faculty = response.getBody();
-        assertThat(faculty).isNotNull();
+        ResponseEntity<Faculty> responseEntity = restTemplate.
+                exchange("http://localhost:" + port + "/student/" +
+                        s.getId() + "/faculty", HttpMethod.GET, null, Faculty.class);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(responseEntity.getBody(), f);
 
 
     }
 
+    @Test
+    void findAllStudents__returnStatus200AndStudentsList() {
+
+        String url = "http://localhost:" + port + "/student/all";
+        ResponseEntity<List<Student>> responseEntity = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<Student>>() {
+                });
+        List<Student> students = responseEntity.getBody();
+
+        assertEquals(200, responseEntity.getStatusCodeValue());
+        assertNotNull(students);
+    }
 
 }
-
-
 
 
 

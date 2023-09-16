@@ -1,45 +1,75 @@
 package ru.hogwarts.school.controller;
 
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
 import ru.hogwarts.school.model.Faculty;
-import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
 import ru.hogwarts.school.repository.StudentRepository;
+import ru.hogwarts.school.service.implementation.FacultyServiceImpl;
+import ru.hogwarts.school.service.implementation.StudentServiceImpl;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.List;
 
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+
+@WebMvcTest(FacultyController.class)
 public class FacultyControllerTest {
 
     @Autowired
-    private TestRestTemplate restTemplate;
-
-    @LocalServerPort
-    private int port;
+    MockMvc mockMvc;
 
     @Autowired
-    private StudentRepository studentRepository;
+    FacultyController facultyController;
+
+    @MockBean
+    FacultyRepository facultyRepository;
+
+    @MockBean
+    StudentRepository studentRepository;
+    @SpyBean
+    FacultyServiceImpl facultyService;
 
     @Autowired
-    private FacultyRepository facultyRepository;
+    ObjectMapper objectMapper;
 
-    Faculty faculty = new Faculty(1L, "Юрфак", "синий");
-    Student student = new Student(1L, "Igor", 10, faculty);
+    Faculty faculty = new Faculty(1L, "иняз", "синий");
 
     @Test
-    public void testCreateFaculty() {
+    void create__returnStatus200() throws Exception {
+        when(facultyRepository.save(faculty)).thenReturn(faculty);
 
-        ResponseEntity<Faculty> response = restTemplate.postForEntity("http://localhost:" + port + "/faculty", faculty, Faculty.class);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(faculty.getName(), response.getBody().getName());
-        assertEquals(faculty.getColor(), response.getBody().getColor());
-
+        mockMvc.perform(post("/faculty")
+                        .content(objectMapper.writeValueAsBytes(faculty))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value(faculty.getName()))
+                .andExpect(jsonPath("$.color").value(faculty.getColor()));
 
     }
+
+    @Test
+    void findColor__returnStatus200() throws Exception {
+
+        when(facultyRepository.findByColor(faculty.getColor())).thenReturn(List.of(faculty));
+        mockMvc.perform(get("/faculty/color" + faculty.getColor()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").value(faculty.getName()))
+                .andExpect(jsonPath("$.[0].color").value(faculty.getColor()));
+    }
+
+
 }
