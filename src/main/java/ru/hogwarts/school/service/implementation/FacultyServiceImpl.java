@@ -69,6 +69,11 @@ public class FacultyServiceImpl implements FacultyService {
 
     @Override
     public List<Faculty> findByNameOrColor(String name, String color) {
+        return null;
+    }
+
+    @Override
+    public List<Faculty> findByNameIgnoreCaseOrColorIgnoreCase(String name, String color) {
         Optional<Faculty> faculty = Optional.ofNullable(facultyRepository.findByNameIgnoreCaseOrColorIgnoreCase(name, color));
         if (faculty.isEmpty()) {
             throw new FacultyException("факультет в базе не найден");
@@ -79,7 +84,8 @@ public class FacultyServiceImpl implements FacultyService {
 
     @Override
     public List<Student> findStudentsByFaculty(long id) {
-        return studentRepository.findByFaculty_id(id);
+        var a =studentRepository.findByFacultyId(id);
+        return studentRepository.findByFacultyId(id);
     }
 
     @Override

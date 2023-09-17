@@ -23,7 +23,7 @@ public class StudentController {
         return studentService.create(student);
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public Student read(@PathVariable long id) { // сделан 1 часть
         return studentService.read(id);
     }
@@ -33,7 +33,7 @@ public class StudentController {
         return studentService.update(student);
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity delete(@PathVariable long id) { // не пошёл
         studentService.delete(id);
         return ResponseEntity.ok().build();
@@ -45,7 +45,7 @@ public class StudentController {
 
     }
 
-    @GetMapping("/age/{ageMin}/{ageMax}")
+    @GetMapping("/age/")
     public List<Student> findByAgeBetween(@RequestParam int min, @RequestParam int max) { // не пошёл
         return studentService.findByAgeBetween(min, max);
     }

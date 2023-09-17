@@ -148,7 +148,7 @@ class FacultyServiceImplTest {
 
         List<Student> studentList = List.of(student);
 
-        when(studentRepository.findByFaculty_id(faculty.getId())).thenReturn(studentList);
+        when(studentRepository.findByFacultyId(faculty.getId())).thenReturn(studentList);
         List<Student> result = underTest.findStudentsByFaculty(1L);
 
         assertEquals(studentList, result);
