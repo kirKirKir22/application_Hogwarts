@@ -3,7 +3,6 @@ package ru.hogwarts.school.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -15,11 +14,7 @@ import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
 import ru.hogwarts.school.repository.StudentRepository;
 import ru.hogwarts.school.service.implementation.FacultyServiceImpl;
-
-
 import java.util.List;
-import java.util.Optional;
-
 import static java.util.Optional.of;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
@@ -119,7 +114,7 @@ public class FacultyControllerTest {
                 .andExpect(jsonPath("$.[0].color").value(faculty.getColor()));
     }
 
-    /*@Test
+    @Test
     void findByNameIgnoreCaseOrColorIgnoreCase_returnStatus200AndListStudents() throws Exception {
 
         when(facultyRepository.findByNameIgnoreCaseOrColorIgnoreCase
@@ -127,7 +122,7 @@ public class FacultyControllerTest {
         mockMvc.perform(get("/faculty/color/" + faculty.getName() + faculty.getColor()))
                 .andExpect(status().isOk());
 
-    }*/
+    }
 
     @Test
     void findByFacultyId_returnStatus200AndListStudents() throws Exception {

@@ -1,7 +1,5 @@
 package ru.hogwarts.school.controller;
 
-import org.assertj.core.api.Assertions;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +15,7 @@ import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
 import ru.hogwarts.school.repository.StudentRepository;
-
 import java.util.List;
-
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -141,7 +137,7 @@ public class StudentControllerTest {
                 },
                 minAge, maxAge
         );
-        assertThat(response.getStatusCodeValue()).isEqualTo(200); // не понял
+        assertThat(response.getStatusCodeValue()).isEqualTo(200);
     }
 
     @Test
