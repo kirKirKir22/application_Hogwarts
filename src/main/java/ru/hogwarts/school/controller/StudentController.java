@@ -19,44 +19,44 @@ public class StudentController {
     }
 
     @PostMapping
-    public Student create(@RequestBody Student student) {
+    public Student create(@RequestBody Student student) { // сделан 1 часть
         return studentService.create(student);
     }
 
     @GetMapping("{id}")
-    public Student read(@PathVariable long id) {
+    public Student read(@PathVariable long id) { // сделан 1 часть
         return studentService.read(id);
     }
 
     @PutMapping
-    public Student update(@RequestBody Student student) {
+    public Student update(@RequestBody Student student) { // не пошёл
         return studentService.update(student);
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity delete(@PathVariable long id) {
+    public ResponseEntity delete(@PathVariable long id) { // не пошёл
         studentService.delete(id);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/age/{age}")
-    public List<Student> readAge(@PathVariable int age) {
+    public List<Student> readAge(@PathVariable int age) { // сделан 1 часть
         return studentService.findByAge(age);
 
     }
 
     @GetMapping("/age/{ageMin}/{ageMax}")
-    public List<Student> findByAgeBetween(@RequestParam int min, @RequestParam int max) {
+    public List<Student> findByAgeBetween(@RequestParam int min, @RequestParam int max) { // не пошёл
         return studentService.findByAgeBetween(min, max);
     }
 
     @GetMapping("/{id}/faculty")
-    public Faculty findStudentFaculty(@PathVariable Long studentId) {
-        return studentService.findStudentByFaculty(studentId);
+    public Faculty findStudentFaculty(@PathVariable Long id) { // не пошёл
+        return studentService.findStudentFaculty(id);
     }
 
     @GetMapping("/all")
-    public List<Student> findAllStudents() {
+    public List<Student> findAllStudents() { // сделан 1 часть
         return studentService.findAllStudents();
     }
 }

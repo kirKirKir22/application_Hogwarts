@@ -19,7 +19,7 @@ public interface StudentService {
 
     List<Student> findByAgeBetween(Integer min, Integer max);
 
-    Faculty findStudentByFaculty(Long studentId);
+    Faculty findStudentFaculty(Long studentId);
 
     List<Student> findAllStudents();
 }
