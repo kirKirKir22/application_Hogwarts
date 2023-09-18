@@ -5,11 +5,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
-
 import ru.hogwarts.school.exception.StudentException;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
@@ -144,6 +142,34 @@ class StudentServiceImplTest {
 
         verify(studentRepository, times(1)).findByAgeBetween(10, 20);
 
+    }
+
+    @Test
+    void findStudentCount_areStudentInDatabase_returnCount() {
+
+        when(studentRepository.findStudentCount()).thenReturn(3);
+        int result = underTest.findStudentCount();
+
+        assertEquals(3, result);
+    }
+
+
+    @Test
+    void findAvgAge__returnAvgAge() {
+
+        when(studentRepository.findAvgAge()).thenReturn(20);
+        int result = underTest.findAvgAge();
+
+        assertEquals(20, result);
+    }
+
+    @Test
+    void findFiveLastStudent__returnedListFiveLastStudent() {
+
+        when(studentRepository.findLastStudent(5)).thenReturn(students);
+        List<Student> result = underTest.findFiveLastStudent();
+
+        assertEquals(students, result);
     }
 
 }

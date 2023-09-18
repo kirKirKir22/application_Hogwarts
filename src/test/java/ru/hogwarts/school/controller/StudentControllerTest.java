@@ -1,7 +1,5 @@
 package ru.hogwarts.school.controller;
 
-import org.assertj.core.api.Assertions;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +15,7 @@ import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
 import ru.hogwarts.school.repository.StudentRepository;
-
 import java.util.List;
-
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -50,11 +46,12 @@ public class StudentControllerTest {
     }
 
 
+
     @Test
     void create__returnStatus200AndStudent() {
 
-        ResponseEntity<Faculty> facultyResponseEntity = restTemplate.
-                postForEntity("http://localhost:" + port + "/faculty", faculty, Faculty.class);
+        var f = facultyRepository.save(faculty);
+        student.setFaculty(f);
         ResponseEntity<Student> studentResponseEntity = restTemplate.
                 postForEntity("http://localhost:" + port + "/student", student, Student.class);
 
@@ -75,7 +72,8 @@ public class StudentControllerTest {
 
     @Test
     void update__returnStatus200AndStudent() {
-        facultyRepository.save(faculty);
+        var f = facultyRepository.save(faculty);
+        student.setFaculty(f);
         Student savedStudent = studentRepository.save(student);
 
         ResponseEntity<Student> response = restTemplate.exchange(
@@ -93,9 +91,9 @@ public class StudentControllerTest {
 
     @Test
     public void deleteStudent__returnStatus200() {
-        facultyRepository.save(faculty);
+        var facultyTMP = facultyRepository.save(faculty);
+        student.setFaculty(facultyTMP);
         Student test = studentRepository.save(student);
-        student.setFaculty(faculty);
 
         String url = "http://localhost:" + port + "/student/" + test.getId();
 
@@ -132,14 +130,14 @@ public class StudentControllerTest {
         int minAge = 20;
         int maxAge = 30;
         ResponseEntity<List<Student>> response = restTemplate.exchange(
-                "http://localhost:" + port + "/student/age/",
+                "http://localhost:" + port + "/student/age/?min=20&max=30",
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<List<Student>>() {
                 },
                 minAge, maxAge
         );
-        assertThat(response.getStatusCodeValue()).isEqualTo(200); // не понял
+        assertThat(response.getStatusCodeValue()).isEqualTo(200);
     }
 
     @Test

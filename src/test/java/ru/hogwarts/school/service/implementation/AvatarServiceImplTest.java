@@ -1,18 +1,19 @@
 package ru.hogwarts.school.service.implementation;
 
-import nonapi.io.github.classgraph.utils.FileUtils;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 import ru.hogwarts.school.exception.AvatarException;
 import ru.hogwarts.school.model.Avatar;
-import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.AvatarRepository;
 import ru.hogwarts.school.service.interfaces.StudentService;
 
-import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -48,18 +49,6 @@ class AvatarServiceImplTest {
         verify(avatarRepository, times(1)).save(any(Avatar.class));
     }
 
-       /* MultipartFile file = new MockMultipartFile
-                ("10.pdf", "10.pdf", "pdf", new byte[]{});
-
-        when(studentService.read(student.getId())).thenReturn(student);
-        when(avatarRepository.findByStudent_id(student.getId())).thenReturn(Optional.empty());
-        avatarService.uploadAvatar(student.getId(), file);
-
-        verify(avatarRepository, times(1)).save(any());
-        assertTrue(FileUtils.canRead(new File(avatarsDir + "/" + student.getId() + "." + file.getContentType())));
-    }*/
-
-
     @Test
     void readFromDB_avatarExists_returnedAvatar() {
 
@@ -81,5 +70,25 @@ class AvatarServiceImplTest {
 
         assertThrows(AvatarException.class, () -> avatarService.readFromDB(id));
 
+    }
+
+    @Test
+    void GetPage__returnListOfAvatars() {
+
+        int pageNo = 0;
+        int size = 10;
+
+        List<Avatar> expectedAvatarList = new ArrayList<>();
+        for (int i = 1; i <= 10; i++) {
+            Avatar avatar = new Avatar();
+            avatar.setId((long) i);
+            expectedAvatarList.add(avatar);
+        }
+
+        Page<Avatar> expectedPage = new PageImpl<>(expectedAvatarList);
+
+        when(avatarRepository.findAll(PageRequest.of(pageNo, size))).thenReturn(expectedPage);
+        List<Avatar> result = avatarService.getPage(pageNo, size);
+        assertEquals(expectedAvatarList, result);
     }
 }

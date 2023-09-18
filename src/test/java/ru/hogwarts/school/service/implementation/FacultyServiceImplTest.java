@@ -10,12 +10,10 @@ import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
 import ru.hogwarts.school.repository.StudentRepository;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
 import static java.util.List.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -128,19 +126,12 @@ class FacultyServiceImplTest {
 
     @Test
     void findByNameOrColor_areFacultyWithColorOrNameInDatabase_returnListWithFacultyByColorOrName() {
+        List<Faculty> facultyList = List.of(faculty);
 
-        when(facultyRepository.findByNameIgnoreCaseOrColorIgnoreCase(faculty.getName(), faculty.getColor())).thenReturn(faculty);
-        List<Faculty> result = underTest.findByNameOrColor(faculty.getName(), faculty.getColor());
+        when(facultyRepository.findByNameIgnoreCaseOrColorIgnoreCase(faculty.getName(), faculty.getColor())).thenReturn(facultyList);
+        List<Faculty> result = underTest.findByNameIgnoreCaseOrColorIgnoreCase(faculty.getName(), faculty.getColor());
         assertEquals(1, result.size());
         assertEquals(faculty, result.get(0));
-    }
-
-
-    @Test
-    void findByNameOrColor_areNotFacultyWithColorOrNameInDatabase_throwFacultyCRUDException() {
-
-        when(facultyRepository.findByNameIgnoreCaseOrColorIgnoreCase(faculty.getName(), faculty.getColor())).thenReturn(null);
-        assertThrows(FacultyException.class, () -> underTest.findByNameOrColor(faculty.getName(), faculty.getColor()));
     }
 
     @Test
@@ -148,7 +139,7 @@ class FacultyServiceImplTest {
 
         List<Student> studentList = List.of(student);
 
-        when(studentRepository.findByFaculty_id(faculty.getId())).thenReturn(studentList);
+        when(studentRepository.findByFacultyId(faculty.getId())).thenReturn(studentList);
         List<Student> result = underTest.findStudentsByFaculty(1L);
 
         assertEquals(studentList, result);

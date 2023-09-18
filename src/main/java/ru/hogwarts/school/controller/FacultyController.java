@@ -26,7 +26,7 @@ public class FacultyController {
         return facultyService.create(faculty);
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public Faculty read(@PathVariable long id) {
         return facultyService.read(id);
     }
@@ -49,14 +49,14 @@ public class FacultyController {
 
     @GetMapping("/color/{color}/{name}")
     public List<Faculty> findByNameIgnoreCaseOrColorIgnoreCase
-            (@RequestParam(required = false) String color,
-             @RequestParam(required = false) String name) {
-        return facultyService.findByNameOrColor(name, color);
+            (@RequestParam(required = false) String name,
+             @RequestParam(required = false) String color) {
+        return facultyService.findByNameIgnoreCaseOrColorIgnoreCase(name, color);
     }
 
     @GetMapping("/{id}/student")
-    public List<Student> findByFaculty_id(@PathVariable long id) {
-        return findByFaculty_id(id);
+    public List<Student> findByFacultyId(@PathVariable long id) {
+        return facultyService.findStudentsByFaculty(id);
     }
 
     @GetMapping("/all")
@@ -65,3 +65,4 @@ public class FacultyController {
 
     }
 }
+
