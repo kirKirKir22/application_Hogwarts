@@ -24,6 +24,7 @@ public interface FacultyService {
     List<Student> findStudentsByFaculty(long id);
 
     List<Faculty> findAllFaculties();
+
 }
 
 
