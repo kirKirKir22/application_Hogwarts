@@ -45,8 +45,6 @@ public class StudentControllerTest {
         facultyRepository.deleteAll();
     }
 
-
-
     @Test
     void create__returnStatus200AndStudent() {
 

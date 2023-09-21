@@ -1,5 +1,7 @@
 package ru.hogwarts.school.service.implementation;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,7 @@ import static java.nio.file.StandardOpenOption.CREATE_NEW;
 @Service
 public class AvatarServiceImpl implements AvatarService {
 
+    private final Logger logger = LoggerFactory.getLogger(AvatarServiceImpl.class);
 
     private String avatarsDir;
     private final StudentService studentService;
@@ -57,22 +60,45 @@ public class AvatarServiceImpl implements AvatarService {
         avatar.setMediaType(avatarFile.getContentType());
         avatar.setData(avatarFile.getBytes());
         avatarRepository.save(avatar);
+
+        logger.info("Аватар успешно загружен для студента c id" + studentId);
     }
 
     @Override
     public Avatar readFromDB(long id) {
-        return avatarRepository.findById(id).orElseThrow(() -> new AvatarException("аватар не найден"));
+        logger.info("Аватар найден:");
+        return avatarRepository.findById(id).
+                orElseThrow(() -> new AvatarException("аватар не найден"));
     }
 
     @Override
     public List<Avatar> getPage(int pageNo, int size) {
         PageRequest request = PageRequest.of(pageNo, size);
-        return avatarRepository.findAll(request).getContent();
+        List<Avatar> avatars = avatarRepository.findAll(request).getContent();
+        logger.info("Получена страница  с аватарами страница" + pageNo + " размер" + size);
+        return avatars;
     }
 
     private String getExtensions(String fileName) {
-        return fileName.substring(fileName.lastIndexOf(".") + 1);
+        int lastDotIndex = fileName.lastIndexOf(".");
+
+        if (lastDotIndex != -1 && lastDotIndex < fileName.length() - 1) {
+            String extension = fileName.substring(lastDotIndex + 1);
+
+            logger.info("Расширение файла '{}' определено как '{}'", fileName, extension);
+
+            return extension;
+        } else {
+
+            logger.warn("Расширение файла '{}' не найдено или не корректно", fileName);
+
+            return "";
+        }
     }
-
-
 }
+
+/* return fileName.substring(fileName.lastIndexOf(".") + 1);*/
+
+
+
+
