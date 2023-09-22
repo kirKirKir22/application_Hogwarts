@@ -23,6 +23,7 @@ public interface FacultyService {
 
     List<Faculty> findAllFaculties();
 
+    String findLongestNameByFaculty();
 }
 
 

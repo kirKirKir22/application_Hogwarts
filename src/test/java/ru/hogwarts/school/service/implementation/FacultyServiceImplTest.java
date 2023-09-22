@@ -10,13 +10,11 @@ import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
 import ru.hogwarts.school.repository.StudentRepository;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+
+import java.util.*;
+
 import static java.util.List.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -145,5 +143,41 @@ class FacultyServiceImplTest {
         assertEquals(studentList, result);
 
     }
+
+    @Test
+    public void findLongestNameByFaculty__NotEmptyRepository_returnedLongestNameByFaculty() {
+
+        Faculty faculty = new Faculty(1L, "Юрфак", "синий");
+        Faculty faculty1 = new Faculty(2L, "педфак", "жёлтый");
+        Faculty faculty2 = new Faculty(3L, "иняз", "красный");
+        Faculty faculty3 = new Faculty(4L, "психологический", "белый");
+
+        List<Faculty> facultyList = List.of(faculty, faculty1, faculty2, faculty3);
+
+        when(facultyRepository.findAll()).thenReturn(facultyList);
+        String result = underTest.findLongestNameByFaculty();
+
+        Optional<String> expectedLongestName = facultyList.stream()
+                .map(Faculty::getName)
+                .max(Comparator.comparingInt(String::length));
+
+        assertTrue(expectedLongestName.isPresent());
+        assertEquals(expectedLongestName.get(), result);
+        assertEquals("психологический", result);
+
+    }
+
+    @Test
+    public void findLongestNameByFaculty__EmptyRepository_returnedLongestNameByFaculty() {
+
+        when(facultyRepository.findAll()).thenReturn(Collections.emptyList());
+
+        FacultyException exception = assertThrows(FacultyException.class, () -> {
+            underTest.findLongestNameByFaculty();
+        });
+
+        assertEquals("в БД нет факультетов", exception.getMessage());
+    }
+
 
 }

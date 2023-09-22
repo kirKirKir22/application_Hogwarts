@@ -64,13 +64,25 @@ public class StudentController {
     public Integer findStudentCount() {
         return studentService.findStudentCount();
     }
+
     @GetMapping("/age-avg")
     public Integer findAvgAge() {
         return studentService.findAvgAge();
     }
+
     @GetMapping("last-five-students")
     public List<Student> findFiveLastStudent() {
         return studentService.findFiveLastStudent();
+    }
+
+    @GetMapping("/name-start-with-a")
+    public List<String> findNamesStartingWithTheLetterIsA() {
+        return studentService.findNamesStartingWithTheLetterIsA();
+    }
+
+    @GetMapping("/age-avg-steam")
+    public Double findAvgAgeByStream() {
+        return studentService.findAvgAgeByStream();
     }
 
 }
