@@ -5,8 +5,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import ru.hogwarts.school.exception.StudentException;
 import ru.hogwarts.school.model.Faculty;
@@ -27,9 +27,9 @@ class StudentServiceImplTest {
 
     Student student = new Student(1L, "Igor", 10, faculty);
 
-    Student student1 = new Student(2L, "Misha", 10, faculty);
+    Student student1 = new Student(2L, "Alex", 10, faculty);
     Student student2 = new Student(3L, "Petr", 15, faculty);
-    Student student3 = new Student(4L, "Oleg", 20, faculty);
+    Student student3 = new Student(4L, "Anna", 20, faculty);
 
 
     List<Student> students = Arrays.asList(student1, student2, student3);
@@ -170,6 +170,33 @@ class StudentServiceImplTest {
         List<Student> result = underTest.findFiveLastStudent();
 
         assertEquals(students, result);
+    }
+
+    @Test
+    public void findNamesStartingWithTheLetterIsA__returnedListStudent() {
+
+        when(studentRepository.findAll()).thenReturn(students);
+        List<String> result = underTest.findNamesStartingWithTheLetterIsA();
+
+        assertEquals(2, result.size());
+        assertTrue(result.contains("ALEX"));
+        assertTrue(result.contains("ANNA"));
+
+    }
+
+    @Test
+    public void findAvgAgeByStream_returnedAvgAgeNum() {
+
+        when(studentRepository.findAll()).thenReturn(students);
+        Double result = underTest.findAvgAgeByStream();
+
+        OptionalDouble expectedAvg = students.stream()
+                .mapToInt(Student::getAge)
+                .average();
+
+        assertTrue(expectedAvg.isPresent());
+        assertEquals(expectedAvg.getAsDouble(), result, 0.001);
+
     }
 
 }

@@ -1,5 +1,6 @@
 package ru.hogwarts.school.service.implementation;
 
+import liquibase.repackaged.org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import ru.hogwarts.school.service.interfaces.StudentService;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -157,5 +159,27 @@ public class StudentServiceImpl implements StudentService {
 
         logger.info("метод findFiveLastStudent вернул: " + studentList);
         return studentList;
+    }
+
+    @Override
+    public List<String> findNamesStartingWithTheLetterIsA() {
+        return studentRepository
+                .findAll()
+                .stream()
+                .map(student -> student.getName())
+                .filter(name -> StringUtils.startsWithIgnoreCase(name, "a"))
+                .map(name -> name.toUpperCase())
+                .sorted()
+                .collect(Collectors.toList());
+
+    }
+    @Override
+    public Double findAvgAgeByStream(){
+        return studentRepository
+                .findAll()
+                .stream()
+                .mapToInt(student->student.getAge())
+                .average()
+                .orElse(0);
     }
 }

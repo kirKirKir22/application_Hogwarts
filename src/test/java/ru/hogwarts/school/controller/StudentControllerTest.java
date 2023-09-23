@@ -15,7 +15,9 @@ import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
 import ru.hogwarts.school.repository.StudentRepository;
+
 import java.util.List;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -38,6 +40,7 @@ public class StudentControllerTest {
 
     Faculty faculty = new Faculty(1L, "физкультурный", "малиновый");
     Student student = new Student(1L, "Igor", 10, faculty);
+    Student student2 = new Student(3L, "Max", 20, faculty);
 
     @AfterEach
     void afterEach() {
@@ -168,6 +171,37 @@ public class StudentControllerTest {
 
         assertEquals(200, responseEntity.getStatusCodeValue());
         assertNotNull(students);
+    }
+
+    @Test
+    public void findNamesStartingWithTheLetterIsA__returnStatus200AndStringNameList() {
+
+        String url = "http://localhost:" + port + "/student/name-start-with-a";
+
+        ResponseEntity<String[]> responseEntity = restTemplate.getForEntity(url, String[].class);
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        String[] names = responseEntity.getBody();
+        assertNotNull(names);
+
+    }
+
+    @Test
+    public void findAvgAgeByStream_returnStatus200AndAvgAgeDoubleNum() {
+
+        facultyRepository.save(faculty);
+        studentRepository.save(student);
+        studentRepository.save(student2);
+
+        String url = "http://localhost:" + port + "/student/age-avg-steam";
+        ResponseEntity<Double> responseEntity = restTemplate.getForEntity(url, Double.class);
+        Double result = (double) (student.getAge() + student2.getAge()) / 2;
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        Double avgAge = responseEntity.getBody();
+        assertEquals(result, avgAge);
+        assertNotNull(avgAge);
+
     }
 
 }

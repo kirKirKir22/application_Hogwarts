@@ -64,5 +64,10 @@ public class FacultyController {
         return facultyService.findAllFaculties();
 
     }
+
+    @GetMapping("/longest-name")
+    public String findLongestNameByFaculty() {
+        return facultyService.findLongestNameByFaculty();
+    }
 }
 

@@ -3,19 +3,26 @@ package ru.hogwarts.school.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.mockito.stubbing.OngoingStubbing;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
 import ru.hogwarts.school.repository.StudentRepository;
 import ru.hogwarts.school.service.implementation.FacultyServiceImpl;
+
 import java.util.List;
+
 import static java.util.Optional.of;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -44,6 +51,7 @@ public class FacultyControllerTest {
     ObjectMapper objectMapper;
 
     Faculty faculty = new Faculty(1L, "иняз", "синий");
+    Faculty faculty2 = new Faculty(4L, "психологический", "белый");
 
     @Test
     void create__returnStatus200() throws Exception {
@@ -103,7 +111,7 @@ public class FacultyControllerTest {
 
     }
 
-    //endregion
+
     @Test
     void findColor__returnStatus200() throws Exception {
 
@@ -118,7 +126,7 @@ public class FacultyControllerTest {
     void findByNameIgnoreCaseOrColorIgnoreCase_returnStatus200AndListStudents() throws Exception {
 
         when(facultyRepository.findByNameIgnoreCaseOrColorIgnoreCase
-                (faculty.getName(),faculty.getColor())).thenReturn(List.of(faculty));
+                (faculty.getName(), faculty.getColor())).thenReturn(List.of(faculty));
         mockMvc.perform(get("/faculty/color/" + faculty.getName() + faculty.getColor()))
                 .andExpect(status().isOk());
 
@@ -147,7 +155,17 @@ public class FacultyControllerTest {
                 .andExpect(jsonPath("$.[0].name").value(faculty.getName()))
                 .andExpect(jsonPath("$.[0].color").value(faculty.getColor()));
 
-
     }
+
+    @Test
+    public void testFindLongestNameByFaculty() throws Exception {
+
+        when(facultyRepository.findAll()).thenReturn((List.of(faculty, faculty2)));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/faculty/longest-name"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string(faculty2.getName()));
+    }
+
 
 }
