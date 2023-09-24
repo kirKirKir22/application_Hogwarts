@@ -3,12 +3,19 @@ package ru.hogwarts.school.controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.hogwarts.school.service.interfaces.ThreadService;
 
 import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/auxiliary")
 public class AuxiliaryController {
+
+    private ThreadService threadService;
+
+    public AuxiliaryController(ThreadService threadService) {
+        this.threadService = threadService;
+    }
 
     @GetMapping
     public Integer streamExperiment() {
@@ -26,5 +33,18 @@ public class AuxiliaryController {
         return sum;
 
     }
+
+    @GetMapping("/threadOne")
+    public void threadExperimentOne() {
+        threadService.threadOne();
+
+    }
+
+    @GetMapping("/threadTwo")
+    public void threadExperimentTwo() {
+        threadService.threadTwo();
+
+    }
+
 
 }

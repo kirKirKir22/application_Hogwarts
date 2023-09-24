@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="AppHogwats" type="Application" factoryName="Application" activateToolWindowBeforeRun="false" show_console_on_std_out="true">
+    <option name="MAIN_CLASS_NAME" value="ru.hogwarts.school.SchoolApplication" />
+    <module name="school" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
