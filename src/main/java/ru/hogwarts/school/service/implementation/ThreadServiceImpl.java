@@ -37,24 +37,34 @@ public class ThreadServiceImpl implements ThreadService {
 
     }
 
-    public synchronized void threadTwo() {
+    public void threadTwo() {
         List<Student> all = studentService.findAllStudents();
-        studentLog(all.get(0));
-        studentLog(all.get(1));
+        studentLogSynchronized(all.get(0));
+        studentLogSynchronized(all.get(1));
 
         new Thread(() -> {
-            studentLog(all.get(2));
-            studentLog(all.get(3));
+            studentLogSynchronized(all.get(2));
+            studentLogSynchronized(all.get(3));
         }).start();
 
         new Thread(() -> {
-            studentLog(all.get(4));
-            studentLog(all.get(5));
+            studentLogSynchronized(all.get(4));
+            studentLogSynchronized(all.get(5));
         }).start();
 
     }
 
     public void studentLog(Student student) {
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        logger.info(student.toString());
+    }
+
+    public synchronized void studentLogSynchronized(Student student) {
         try {
             Thread.sleep(3000);
         } catch (InterruptedException e) {
