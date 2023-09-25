@@ -21,8 +21,6 @@ public interface StudentService {
 
     Faculty findStudentFaculty(Long studentId);
 
-    List<Student> findAllStudents();
-
     Integer findStudentCount();
 
     Integer findAvgAge();
@@ -32,4 +30,7 @@ public interface StudentService {
     List<String> findNamesStartingWithTheLetterIsA();
 
     Double findAvgAgeByStream();
+
+    List<Student> findAllStudents();
+
 }
